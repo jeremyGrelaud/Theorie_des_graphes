@@ -21,8 +21,10 @@ import java.util.Scanner;
 public class Graphe {
 	private int nbr_arcs;
 	private int nbr_sommets;
-	private int[][] matrice_adjacence;
-	private int[][] matrice_valeurs;
+	private float[][] matrice_adjacence;
+	private float[][] matrice_valeurs;
+	public static float infinity = Float.POSITIVE_INFINITY;
+
 	
 	
 	public Graphe() {
@@ -89,7 +91,7 @@ public class Graphe {
 		for(int i=0 ; i<this.getMatrice_adjacence().length; i++) {
 			System.out.print(" sommet n°" + i  +" | ");
 			for(int j=0 ; j<this.getMatrice_adjacence().length; j++) {
-				System.out.print(this.matrice_adjacence[i][j] + " ");
+				System.out.print((int)this.matrice_adjacence[i][j] + " ");
 			}
 			System.out.println(" ");
 		}
@@ -116,7 +118,7 @@ public class Graphe {
 		for(int i=0 ; i<this.getMatrice_valeurs().length; i++) {
 			System.out.print(" sommet n°" + i  +" | ");
 			for(int j=0 ; j<this.getMatrice_valeurs().length; j++) {
-				System.out.print(this.matrice_valeurs[i][j] + "   ");
+				System.out.print((int)this.matrice_valeurs[i][j] + "   ");
 			}
 			System.out.println(" ");
 		}
@@ -124,7 +126,7 @@ public class Graphe {
 		
 		
 		
-        for (int[] ligne : this.getMatrice_valeurs()) {
+        for (float[] ligne : this.getMatrice_valeurs()) {
         	// converti chaque ligne en string
             //puis print 1 a 1 les lignes
             System.out.println(Arrays.toString(ligne));
@@ -133,48 +135,60 @@ public class Graphe {
         
         
         /*tests pour représenter l'infini*/
-        /*
-         double inf = Double.POSITIVE_INFINITY;
-         int IntValue = (int) inf;
-         if(inf>5) {
-        	 System.out.println(inf);
-        	 System.out.println(IntValue);
-         }
-         
-         if(IntValue>4) {
-        	 System.out.println("vrai");
-        	
-         }*/ 
-        //non utilisé car engendre des problèmes  infini+4 = -infini+4 car on ne peut pas dépasser cette valeur inforatiquement
         
-            
+         /*float inf = Float.POSITIVE_INFINITY;
+         System.out.println(inf-5 < inf);
+         System.out.println(inf+4 < inf);
+         System.out.println(4 < inf);
+         float test = 1;
+         System.out.println((int)test); //faudra cast à l'affichage*/
 		
 	}
 	
-	public String obtenirChemin(int[][]matrice_des_chemins, int depart, int arrivee) { //affiche le chemin minimal d'un point de départ vers un point d'arrivée
+	public String[] obtenirChemin(float[][]matrice_des_chemins, int depart, int arrivee) { //affiche le chemin minimal d'un point de départ vers un point d'arrivée
 		//fonction recursive
-		String le_chemin = String.valueOf(depart);
+		String[] le_chemin = new String[2];
+		le_chemin[0] = String.valueOf(depart);
+		le_chemin[1] = ""; 
+		float[][] mat_val = this.getMatrice_valeurs();
 		
 		if(matrice_des_chemins[depart][arrivee] != depart) { //cela veut dire qu'il existe un chemin avec un poids plus court passant par un sommet intermédiare ou plus
-			le_chemin = obtenirChemin(matrice_des_chemins,depart,matrice_des_chemins[depart][arrivee]);
+			le_chemin = obtenirChemin(matrice_des_chemins,depart,(int) matrice_des_chemins[depart][arrivee]);
 		}
 		
-		return le_chemin + " " + String.valueOf(arrivee); //iteration ou nous arrivons à la fin du chemin
+		//return le_chemin + " " + String.valueOf(arrivee);
+		le_chemin[0] = le_chemin[0] + " " + String.valueOf(arrivee);
+		le_chemin[1] = le_chemin[1] + (int)matrice_valeurs[(int) matrice_des_chemins[depart][arrivee]][arrivee] + " ";
+		return le_chemin;
+		
+		//return le_chemin + " " + String.valueOf(arrivee) +" cout : " + matrice_valeurs[(int) matrice_des_chemins[depart][arrivee]][arrivee]; //iteration ou nous arrivons à la fin du chemin
+		
+		
 	}
 	
-	public void afficheLesChemins(int[][]matrice_des_chemins) { //affiche tous les chemins les plus courts entre tous les points du graphe
+	public void afficheLesChemins(float[][]matrice_des_chemins) { //affiche tous les chemins les plus courts entre tous les points du graphe
 		
 		int taille = matrice_des_chemins.length;
 		for(int i=0; i<taille;i++) {
 			for(int j=0; j<taille;j++) {
 				if((i != j) && (matrice_des_chemins[j][i] != -1)) {
-					System.out.println("Chemin le plus court du sommet "+ j + " vers "+ i + ": (" + obtenirChemin(matrice_des_chemins, j, i) + ")");
+					
+					String[] tableau_des_couts = obtenirChemin(matrice_des_chemins, j, i )[1].split(" ");
+					int cout_du_chemin = 0;
+					for(String elem : tableau_des_couts) {
+						cout_du_chemin = cout_du_chemin + Integer.parseInt(elem);
+					}
+					
+					//j le sommet de départ et i le sommet d'arrivée
+					//System.out.println("Chemin le plus court du sommet "+ j + " vers "+ i + ": (" + obtenirChemin(matrice_des_chemins, j, i ) +")" + " cout : "+ somme );
+					System.out.println("Chemin le plus court du sommet "+ j + " vers "+ i + ": (" + obtenirChemin(matrice_des_chemins, j, i )[0] +")" + " cout : "+ cout_du_chemin );
+					
 				}
 			}
 		}
 	}
 	    /*La matrice des distances c'est L dans l'algo du cours et celle des chemins c'est P*/
-	public void floydWarshall(int matrice_des_distances[][]) {
+	public void floydWarshall(float matrice_des_distances[][]) {
 		//calcule puis affiche tous les plus courts chemins du graphe à partir de la matrice initiale des distances
 		//avec dans la case [i][j] le poids de l'arc du sommet i vers j directement   et 0 dans la diagonale car le poids pour aller d'un sommet vers lui même sera considéré égal à 0 quand il n'existera pas d'arc
 		//et une valeur représentant l'infini pour les poids inconnu au debut
@@ -182,7 +196,7 @@ public class Graphe {
 		
 		int taille = matrice_des_distances.length;
 		
-		int[][]matrice_des_chemins = new int[taille][taille];
+		float[][]matrice_des_chemins = new float[taille][taille];
 		//on initialise toutes les cases à -1
 		for(int i=0; i<taille; i++) {
 			for(int j=0; j<taille; j++) {
@@ -191,14 +205,11 @@ public class Graphe {
 		}
 		
 		//on a besoin de définir l'infini comme on l'a défini dans la matrice des distances
-		/*double inf = Double.POSITIVE_INFINITY;
-        int infini = (int) inf;*/
-        int infini = 1000;
         
 		//remplissage de certaines cases de la matrice par rapport aux arcs initiaux qui sont les arcs allant directement du sommet a vers sommet b
 		for(int depart=0; depart<taille; depart++) {
 			for(int arrivee=0; arrivee<taille; arrivee++) {
-				if( (depart != arrivee) && (matrice_des_distances[depart][arrivee] != infini) ) {
+				if( (depart != arrivee) && (matrice_des_distances[depart][arrivee] != infinity) ) {
 					//1ere condition exclu un chemin d'un sommet vers lui même
 					//2eme condition si le poids n'est pas infini dans la matrice des distances c'est qu'un arc existe entre depart et arrivee
 					matrice_des_chemins[depart][arrivee] = depart;
@@ -241,12 +252,18 @@ public class Graphe {
 		afficheLesChemins(matrice_des_chemins);	
 	}
 	
-	public void printmatrice(int[][]matrice) {
+	public void printmatrice(float[][]matrice) {
 		 for(int i=0 ; i<matrice.length; i++) {
 				System.out.print("n°" + i  +" | ");
 				System.out.print("\t");
 				for(int j=0 ; j<matrice.length; j++) {
-					System.out.print(matrice[i][j] + "\t");
+					if(matrice[i][j] == infinity) {
+						System.out.print(matrice[i][j] + "\t");
+					}
+					else {
+						System.out.print((int)matrice[i][j] + "\t");
+					}
+					
 				}
 				System.out.println(" ");
 			}
@@ -258,7 +275,7 @@ public class Graphe {
 
 		/*double inf = Double.POSITIVE_INFINITY;
 		int infini = (int) inf;*/
-		int infini = 1000;
+		//int infini = 1000;
 		
 		/*La matrice d'adjacence :
 		 * {0,0,1,0}
@@ -275,18 +292,17 @@ public class Graphe {
 	        {infini, infini, 0, 2},
 	        {infini, -1, infini, 0}};	*/   
 	    
-	    int[][] distance = this.creation_matrice_L_initiale();
+		float[][] distance = this.creation_matrice_L_initiale();
 			
 	    this.floydWarshall(distance);
 	}
 	   
-	public int[][] creation_matrice_L_initiale(){
+	public float[][] creation_matrice_L_initiale(){
 		
-		int infini = 1000;
-		int[][] mat_adj = this.getMatrice_adjacence();
-		int[][] mat_val = this.getMatrice_valeurs();
+		float[][] mat_adj = this.getMatrice_adjacence();
+		float[][] mat_val = this.getMatrice_valeurs();
 		int taille = mat_adj.length;
-		int[][] mat_L = new int[taille][taille];
+		float[][] mat_L = new float[taille][taille];
 		
 		for(int i=0; i<taille; i++) {
 			for(int j=0; j<taille; j++) {
@@ -297,7 +313,7 @@ public class Graphe {
 					mat_L[i][j] = mat_val[i][j] ;
 				}
 				else {
-					mat_L[i][j] = infini;
+					mat_L[i][j] = infinity;
 				}
 			}
 		}
@@ -305,8 +321,6 @@ public class Graphe {
 		return mat_L;
 	}
 
-	
-	
 	
 	public void programme() {
 		Graphe graphe_depart = new Graphe(this);
@@ -348,6 +362,7 @@ public class Graphe {
 			}
 			
 		}while(!mot.equals("EXIT"));
+		sc.close();
 		//fin
 		//System.out.println("Fin du programme");
 		//sc.close();
@@ -355,17 +370,17 @@ public class Graphe {
 		//on ferme donc le scanner dans execution
 		
 	}
-	public int[][] getMatrice_adjacence() {
+	public float[][] getMatrice_adjacence() {
 		return matrice_adjacence;
 	}
-	public void setMatrice_adjacence(int[][] matrice_adjacence) {
+	public void setMatrice_adjacence(float[][] matrice_adjacence) {
 		this.matrice_adjacence = matrice_adjacence;
 	}
-	public int[][] getMatrice_valeurs() {
+	public float[][] getMatrice_valeurs() {
 		return matrice_valeurs;
 	}
-	public void setMatrice_valeurs(int[][] matrice_valeurs) {
-		this.matrice_valeurs = matrice_valeurs;
+	public void setMatrice_valeurs(float[][] fs) {
+		this.matrice_valeurs = fs;
 	}
 
 }

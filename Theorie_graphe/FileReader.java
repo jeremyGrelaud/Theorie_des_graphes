@@ -17,8 +17,8 @@ public class FileReader {
 		int line = 0;
 		int NbSommets = 0;
 		int NbArcs = 0;
-		int[][] matrice_d_adjacence = null;
-		int[][] matrice_de_valeurs = null;
+		float[][] matrice_d_adjacence = null;
+		float[][] matrice_de_valeurs = null;
 
 		while (scanner.hasNextLine()) { // continue de lire tant qu'il y a des lignes
 			String content = scanner.nextLine(); // enleve les espaces
@@ -29,8 +29,8 @@ public class FileReader {
 			case 0: // Ligne 1 = le nbr de sommets du grahe
 				NbSommets = Integer.valueOf(content);
 				graphe.setNbr_sommets(NbSommets);
-				matrice_d_adjacence = new int[NbSommets][NbSommets] ;
-				matrice_de_valeurs = new int[NbSommets][NbSommets] ;
+				matrice_d_adjacence = new float[NbSommets][NbSommets] ;
+				matrice_de_valeurs = new float[NbSommets][NbSommets] ;
 				
 				break;
 			case 1: //le nbr d arcs
