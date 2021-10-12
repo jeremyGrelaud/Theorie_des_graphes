@@ -19,29 +19,28 @@ import java.util.Scanner;
 
 
 public class Graphe {
-	private List<Sommet> sommets; /*liste des differents sommets du graphe*/
 	private int nbr_arcs;
 	private int nbr_sommets;
+	private float[][] matrice_adjacence;
+	private float[][] matrice_valeurs;
+	public static float infinity = Float.POSITIVE_INFINITY;
+
+
+	
 	
 	public Graphe() {
-		this.sommets = new ArrayList<Sommet>();
 		this.nbr_arcs = 0; //quand on initialise on ne sait pas encore on le remplira plus tard en lisant le fichier
 		this.setNbr_sommets(0); //on ne sait pas avant la lecture du fichier
+		
 	}
 	public Graphe(final Graphe graphe) { //constructeur de copie
 	
-		List<Sommet> nouvelle_liste = new ArrayList<Sommet>(); //la nouvelle liste des sommets ou on va les copier
-			for(int i=0; i<graphe.sommets.size();i++) { //on regarde la taille de la liste des sommets  = nbr de sommets du graphe
-				Sommet new_sommet = new Sommet(graphe.sommets.get(i));
-				nouvelle_liste.add(new_sommet);
-			}
-		this.sommets = nouvelle_liste;
-
 		this.nbr_arcs = graphe.getNbArcs();
-		this.setNbr_sommets(graphe.sommets.size());
+		this.setNbr_sommets(graphe.getNbr_sommets());
+		this.setMatrice_adjacence(graphe.getMatrice_adjacence());
+		this.setMatrice_valeurs(graphe.getMatrice_valeurs());
 		
 	}
-	
 	
 	public int getNbArcs() {
 		return nbr_arcs;
@@ -51,20 +50,6 @@ public class Graphe {
 		this.nbr_arcs = nbr_arcs;
 	}
 
-	
-
-	public List<Sommet> getSommets() {
-		return this.sommets;
-	}
-
-	public void setSommets(final List<Sommet> sommets) {
-		List<Sommet> nouvelle_liste_sommets = new ArrayList<Sommet>();
-		for(int i=0; i<this.sommets.size();i++) {
-			nouvelle_liste_sommets.add(this.sommets.get(i));
-		}
-		this.sommets = nouvelle_liste_sommets;
-	}
-	
 	public int getNbr_sommets() {
 		return nbr_sommets;
 	}
@@ -72,27 +57,6 @@ public class Graphe {
 		this.nbr_sommets = nbr_sommets;
 	}
 
-	public boolean containsSommets(final String la_chaine) {  //faut check les nom des sommets de la liste et voir si c'est dedan
-		for (Sommet sommet : getSommets()){ //pour chaque sommet dans la liste des sommets
-			if(sommet.getNom().equals(la_chaine)) {
-				return true;
-			}
-		}//si aucun des sommets dans la liste ne correspondait à celui recherché on retourne faux
-		return false; 
-	}
-	
-	//fonction simmilaire à la précédente sauf que cette fois on retourne un Sommet au lieu d'un booléen
-	//on parcours la liste jusqu'a trouver l'etat correspondant
-    public Sommet getSommetByNom(String id) {
-        for (Sommet som : this.sommets) { //pour chaque sommet du graphe
-            if (som.getNom().equals(id)) { //si le nom correspond au sommet recherché
-                return som; //on retourne ce sommet
-            }
-        }
-        
-        return null; // si le sommet n'est pas dans le graphe on retourne null
-    }
-	
 	
 	public void afficher_graphe() {
 		
@@ -100,31 +64,313 @@ public class Graphe {
 		
 		
 		System.out.print("La liste des sommets : ");
-		for(int i=0; i<graphe.sommets.size();i++) {
-				System.out.print(graphe.getSommets().get(i).getNom()+" ");
+		for(int i=0; i<graphe.getNbr_sommets();i++) {
+				System.out.print(i+" ");
 		} 
 		//Affichage des arcs
 		System.out.println("");
 		System.out.print("Il y a " + getNbArcs() + " arcs :");
 		System.out.println("");
+		
 
-		 for (Sommet sommet : this.sommets) { //pour chaque sommet dans la liste
-		    for(String clef : sommet.getArc().keySet()) { //string avec toutes les clefs
-		    	/*if(clef.equals("")) {
-		    		System.out.println(sommet.getNom() +" * " +Arrays.toString(sommet.getArc().get(clef).toArray()));
-		    	}*/
-		    	//else {
-		    		System.out.println(sommet.getNom() + " " +Arrays.toString(sommet.getArc().get(clef).toArray()) + " valeur : " +clef);
-		    	//}
-		    	
-		    }
-		    		
-		    
-	     }
-
+		//Affichage de la matrice d'adjacence
+		System.out.println("MATRICE D ADJACENCE");
+		
+		System.out.print("              ");
+		for(int i=0 ; i<this.getMatrice_adjacence().length; i++) {
+			System.out.print(i+" ");
+		}
+		System.out.println(" ");
+		
+		
+		System.out.print("              ");
+		for(int i=0 ; i<this.getMatrice_adjacence().length; i++) {
+			System.out.print("- ");
+		}
+		System.out.println(" ");
+		
+		for(int i=0 ; i<this.getMatrice_adjacence().length; i++) {
+			System.out.print(" sommet n°" + i  +" | ");
+			for(int j=0 ; j<this.getMatrice_adjacence().length; j++) {
+				System.out.print((int)this.matrice_adjacence[i][j] + " ");
+			}
+			System.out.println(" ");
+		}
+		
+		
+		
+		
+		//Affichage de la matrice des valeurs
+		System.out.println("MATRICE DES VALEURS");
+		
+		System.out.print("              ");
+		for(int i=0 ; i<this.getMatrice_valeurs().length; i++) {
+			System.out.print(i+"   ");
+		}
+		System.out.println(" ");
+		
+		
+		System.out.print("              ");
+		for(int i=0 ; i<this.getMatrice_valeurs().length; i++) {
+			System.out.print("-   ");
+		}
+		System.out.println(" ");
+		
+		for(int i=0 ; i<this.getMatrice_valeurs().length; i++) {
+			System.out.print(" sommet n°" + i  +" | ");
+			for(int j=0 ; j<this.getMatrice_valeurs().length; j++) {
+				System.out.print((int)this.matrice_valeurs[i][j] + "   ");
+			}
+			System.out.println(" ");
+		}
+		
+		
+		
+		
+        for (float[] ligne : this.getMatrice_valeurs()) {
+        	// converti chaque ligne en string
+            //puis print 1 a 1 les lignes
+            System.out.println(Arrays.toString(ligne));
+        }
+ 
+        
+        
+        /*tests pour représenter l'infini*/
+        
+         /*float inf = Float.POSITIVE_INFINITY;
+         System.out.println(inf-5 < inf);
+         System.out.println(inf+4 < inf);
+         System.out.println(4 < inf);
+         float test = 1;
+         System.out.println((int)test); //faudra cast à l'affichage*/
+		
 	}
 	
+	public String[] obtenirChemin(float[][]matrice_des_chemins, int depart, int arrivee) { //affiche le chemin minimal d'un point de départ vers un point d'arrivée
+		//fonction recursive
+		String[] le_chemin = new String[2];
+		le_chemin[0] = String.valueOf(depart);
+		le_chemin[1] = ""; 
+		float[][] mat_val = this.getMatrice_valeurs();
+		
+		if(matrice_des_chemins[depart][arrivee] != depart) { //cela veut dire qu'il existe un chemin avec un poids plus court passant par un sommet intermédiare ou plus
+			le_chemin = obtenirChemin(matrice_des_chemins,depart,(int) matrice_des_chemins[depart][arrivee]);
+		}
+		
+		//return le_chemin + " " + String.valueOf(arrivee);
+		le_chemin[0] = le_chemin[0] + " " + String.valueOf(arrivee);
+		le_chemin[1] = le_chemin[1] + (int)matrice_valeurs[(int) matrice_des_chemins[depart][arrivee]][arrivee] + " ";
+		return le_chemin;
+		
+		//return le_chemin + " " + String.valueOf(arrivee) +" cout : " + matrice_valeurs[(int) matrice_des_chemins[depart][arrivee]][arrivee]; //iteration ou nous arrivons à la fin du chemin
+		
+		
+	}
 	
+	public void afficheLesChemins(float[][]matrice_des_chemins) { //affiche tous les chemins les plus courts entre tous les points du graphe
+		
+		int taille = matrice_des_chemins.length;
+		for(int i=0; i<taille;i++) {
+			for(int j=0; j<taille;j++) {
+				if((i != j) && (matrice_des_chemins[j][i] != -1)) {
+					
+					String[] tableau_des_couts = obtenirChemin(matrice_des_chemins, j, i )[1].split(" ");
+					int cout_du_chemin = 0;
+					for(String elem : tableau_des_couts) {
+						cout_du_chemin = cout_du_chemin + Integer.parseInt(elem);
+					}
+					
+					//j le sommet de départ et i le sommet d'arrivée
+					//System.out.println("Chemin le plus court du sommet "+ j + " vers "+ i + ": (" + obtenirChemin(matrice_des_chemins, j, i ) +")" + " cout : "+ somme );
+					System.out.println("Chemin le plus court du sommet "+ j + " vers "+ i + ": (" + obtenirChemin(matrice_des_chemins, j, i )[0] +")" + " cout : "+ cout_du_chemin );
+					
+				}
+			}
+		}
+	}
+	    /*La matrice des distances c'est L dans l'algo du cours et celle des chemins c'est P*/
+	public void floydWarshall(float matrice_des_distances[][]) {
+		//calcule puis affiche tous les plus courts chemins du graphe à partir de la matrice initiale des distances
+		//avec dans la case [i][j] le poids de l'arc du sommet i vers j directement   et 0 dans la diagonale car le poids pour aller d'un sommet vers lui même sera considéré égal à 0 quand il n'existera pas d'arc
+		//et une valeur représentant l'infini pour les poids inconnu au debut
+		
+		
+		int taille = matrice_des_distances.length;
+		
+		float[][]matrice_des_chemins = new float[taille][taille];
+		//on initialise toutes les cases à -1
+		for(int i=0; i<taille; i++) {
+			for(int j=0; j<taille; j++) {
+				matrice_des_chemins[i][j] = -1;
+			}
+		}
+		
+		//on a besoin de définir l'infini comme on l'a défini dans la matrice des distances
+        
+		//remplissage de certaines cases de la matrice par rapport aux arcs initiaux qui sont les arcs allant directement du sommet a vers sommet b
+		for(int depart=0; depart<taille; depart++) {
+			for(int arrivee=0; arrivee<taille; arrivee++) {
+				if( (depart != arrivee) && (matrice_des_distances[depart][arrivee] != infinity) ) {
+					//1ere condition exclu un chemin d'un sommet vers lui même
+					//2eme condition si le poids n'est pas infini dans la matrice des distances c'est qu'un arc existe entre depart et arrivee
+					matrice_des_chemins[depart][arrivee] = depart;
+				}
+			}
+		}
+		
+		
+		//on parcours ensuite toutes les cases de la matrice
+		//pour avoir tous les sommets de départ et d'arrivée
+		//plus les sommets intermédiaires
+		for(int inter=0; inter<taille; inter++) {
+			for(int depart=0; depart<taille; depart++) {
+				for(int arrivee=0; arrivee<taille; arrivee++) {
+					if( matrice_des_distances[depart][inter] + matrice_des_distances[inter][arrivee] < matrice_des_distances[depart][arrivee]) { //si il existe un chemin intermédiaire moins couteux en poids
+						matrice_des_distances[depart][arrivee] = matrice_des_distances[depart][inter] + matrice_des_distances[inter][arrivee]; //on attribut ce nouveau poids moins élevé
+						matrice_des_chemins[depart][arrivee] = matrice_des_chemins[inter][arrivee];	 //et on update la table des chemins pour renseigner le chemin intermédiaire emprunté
+					}
+					
+				}
+				
+				System.out.println("MATRICE L");
+				//this.printmatrice(matrice_des_distances);
+				this.affichageequilibre(matrice_des_distances);
+				
+				System.out.println("MATRICE P");
+				//this.printmatrice(matrice_des_chemins);
+				this.affichageequilibre(matrice_des_chemins);
+				
+				if( matrice_des_distances[depart][depart] < 0) {
+					 System.out.println("Circuit absorbant détecté");
+		                return;
+				 }
+		               
+			}
+			
+		}
+		
+		System.out.println("Aucun circuit absorbant détecté");
+		
+		//on fait appel à la fonction d'affichage de tous les chemins
+		afficheLesChemins(matrice_des_chemins);	
+	}
+	
+	/*
+	public void printmatrice(float[][]matrice) {
+		 for(int i=0 ; i<matrice.length; i++) {
+				System.out.print("n°" + i  +" | ");
+				System.out.print("\t");
+				for(int j=0 ; j<matrice.length; j++) {
+					if(matrice[i][j] == infinity) {
+						System.out.print(matrice[i][j] + "\t");
+					}
+					else {
+						System.out.print((int)matrice[i][j] + "\t");
+					}
+					
+				}
+				System.out.println(" ");
+			}
+		 System.out.println(" ");
+		 System.out.println(" ");
+	}*/
+	
+	
+	public void affichageequilibre(float[][]array) {
+
+		int maxLength = 0;
+		for (int x = 0; x < array.length; x++) {
+	        for (int y = 0; y < array[x].length; y++) {
+	            int numberOfDigits = String.valueOf(String.valueOf((int)array[x][y])).length();
+	            if(numberOfDigits > maxLength)
+	            	maxLength = numberOfDigits;
+	        }
+	    }
+		
+		Graphe.printTableau(array, maxLength);
+}
+	private static void printTableau(float [][] array, int maxLength){
+		 if(array == null || array.length < 1 || array[0].length < 1)
+		        throw new IllegalArgumentException("array must be non-null, and must have a size of at least \"new int[1][1]\"");
+		 
+		 System.out.print("sommets");
+		
+		 for (int i = 0; i < array.length; i++) {
+			 System.out.printf("%" + (maxLength+2) + "s",i);
+		 }
+		 System.out.println("");
+		 System.out.print("        ");
+		 for (int i = 0; i < (maxLength+2)*(array.length); i++) {
+			 System.out.print("_");
+		 }
+		 System.out.println("");
+		 
+		 	for (int i = 0; i < array.length; i++) {
+		    	System.out.print("n°" + i  +" | ");
+				System.out.print("\t");
+		        for(int j = 0; j < array[0].length; j++)
+		        	if(array[i][j] == infinity) {
+		        		System.out.printf("[%" + maxLength + "s]", array[i][j]);
+		        	}
+		        	else {
+		        		System.out.printf("[%" + maxLength + "s]", (int)array[i][j]);
+		        	}
+		        	
+		        System.out.println();
+		    }
+		    System.out.println("");
+	}
+
+	public void test() {
+
+		/*double inf = Double.POSITIVE_INFINITY;
+		int infini = (int) inf;*/
+		//int infini = 1000;
+		
+		/*La matrice d'adjacence :
+		 * {0,0,1,0}
+		 * {1,0,1,0}
+		 * {0,0,0,1}
+		 * {0,1,0,0}
+		 * */
+				    
+		//matrice des distances initiale
+		/*
+	    int[][] distance = 
+	    	{{0, infini, -2, infini},
+	        {4, 0, 3, infini},
+	        {infini, infini, 0, 2},
+	        {infini, -1, infini, 0}};	*/   
+	    
+		float[][] distance = this.creation_matrice_L_initiale();
+			
+	    this.floydWarshall(distance);
+	}
+	   
+	public float[][] creation_matrice_L_initiale(){
+		
+		float[][] mat_adj = this.getMatrice_adjacence();
+		float[][] mat_val = this.getMatrice_valeurs();
+		int taille = mat_adj.length;
+		float[][] mat_L = new float[taille][taille];
+		
+		for(int i=0; i<taille; i++) {
+			for(int j=0; j<taille; j++) {
+				if(i == j) {
+					mat_L[i][j] = 0;
+				}
+				if(mat_adj[i][j]==1) {
+					mat_L[i][j] = mat_val[i][j] ;
+				}
+				else {
+					mat_L[i][j] = infinity;
+				}
+			}
+		}
+		
+		return mat_L;
+	}
+
 	
 	public void programme() {
 		Graphe graphe_depart = new Graphe(this);
@@ -156,7 +402,7 @@ public class Graphe {
 			
 			if(mot.equals("1")){
 				
-				System.out.println("Rien : ");
+				graphe_depart.test();
 				
 			}
 			if(mot.equals("2")){
@@ -166,12 +412,25 @@ public class Graphe {
 			}
 			
 		}while(!mot.equals("EXIT"));
+		sc.close();
 		//fin
 		//System.out.println("Fin du programme");
 		//sc.close();
 		//on ne peut pas fermer le scanner ici sinon on n'a plus de flux dans la fonction execution
 		//on ferme donc le scanner dans execution
 		
+	}
+	public float[][] getMatrice_adjacence() {
+		return matrice_adjacence;
+	}
+	public void setMatrice_adjacence(float[][] matrice_adjacence) {
+		this.matrice_adjacence = matrice_adjacence;
+	}
+	public float[][] getMatrice_valeurs() {
+		return matrice_valeurs;
+	}
+	public void setMatrice_valeurs(float[][] fs) {
+		this.matrice_valeurs = fs;
 	}
 
 }

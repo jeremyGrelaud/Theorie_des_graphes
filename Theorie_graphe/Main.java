@@ -1,5 +1,7 @@
 package Theorie_graphe;
 
+
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -109,7 +111,7 @@ public class Main {
 		chemin = chemin.replaceAll("bin", "");*/
 		
 		//D:/Efrei/L2/java/workspace/Theorie_des_graphes_L3
-		String chemin = "D:/Efrei/L2/java/workspace/Theorie_des_graphes_L3/";
+		String chemin = "D:/Efrei/L2/java/workspace/Theorie_des_graphes_V2/";
 		
 		String path = chemin + "src/Theorie_graphe/files/" + graphe_choisi +".txt";
 		
